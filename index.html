@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stochastik-Wiederholung · Mathe LK</title>
+<style>
+  :root{
+    --bg:#0f1424;
+    --bg2:#151b30;
+    --card:#1b2238;
+    --card2:#222b46;
+    --ink:#e8ecf7;
+    --muted:#9aa6c4;
+    --line:#2c3654;
+    --accent:#6c8cff;
+    --accent2:#39d6c4;
+    --good:#36d399;
+    --bad:#ff6b81;
+    --warn:#ffce5a;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 80% -10%,#1d2542 0%,var(--bg) 55%) fixed;
+    color:var(--ink);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent)}
+  .wrap{max-width:1060px;margin:0 auto;padding:24px 20px 80px}
+
+  /* Hero */
+  header.hero{
+    background:linear-gradient(135deg,#243056,#1a2138);
+    border:1px solid var(--line);
+    border-radius:24px;
+    padding:30px 32px;
+    box-shadow:var(--shadow);
+    position:relative;overflow:hidden;
+  }
+  header.hero::after{
+    content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;
+    background:radial-gradient(circle,rgba(57,214,196,.25),transparent 60%);
+  }
+  .badge{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent2);font-weight:700;margin-bottom:8px}
+  h1{margin:0 0 8px;font-size:30px;letter-spacing:-.02em}
+  .hero p{margin:0;color:var(--muted);max-width:680px}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:18px;font-size:13px;color:var(--muted)}
+  .legend b{color:var(--ink)}
+
+  /* Tabs */
+  nav.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0 10px;position:sticky;top:0;
+    z-index:20;background:linear-gradient(var(--bg),rgba(15,20,36,.85));padding:10px 0;backdrop-filter:blur(6px)}
+  .tab{
+    border:1px solid var(--line);background:var(--card);color:var(--muted);
+    padding:10px 16px;border-radius:999px;cursor:pointer;font-weight:600;font-size:14px;
+    display:flex;align-items:center;gap:8px;transition:.15s;
+  }
+  .tab .dot{width:9px;height:9px;border-radius:50%;background:var(--line)}
+  .tab:hover{color:var(--ink);border-color:#3a4566}
+  .tab.active{background:linear-gradient(135deg,var(--accent),#5a6cff);color:#fff;border-color:transparent;box-shadow:0 6px 18px rgba(108,140,255,.35)}
+  .tab.active .dot{background:#fff}
+  .tab .count{font-size:12px;opacity:.8}
+
+  section.panel{display:none;animation:fade .25s ease}
+  section.panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .intro{
+    background:var(--bg2);border:1px solid var(--line);border-left:4px solid var(--accent2);
+    border-radius:12px;padding:16px 20px;margin:14px 0 22px;color:var(--muted)
+  }
+  .intro b,.intro strong{color:var(--ink)}
+  .intro h3{margin:0 0 6px;color:var(--ink);font-size:17px}
+
+  /* progress */
+  .progwrap{display:flex;align-items:center;gap:12px;margin:6px 0 0;font-size:13px;color:var(--muted)}
+  .progbar{flex:1;height:8px;background:var(--card2);border-radius:99px;overflow:hidden}
+  .progbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .4s}
+
+  /* Exercise card */
+  .ex{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 22px;margin:16px 0;box-shadow:var(--shadow);position:relative}
+  .ex .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+  .ex .no{font-weight:700;font-size:15px;color:var(--accent2)}
+  .stars{color:var(--warn);letter-spacing:2px;font-size:14px}
+  .stars .off{color:var(--line)}
+  .prompt{margin:4px 0 14px}
+  .prompt .q{color:var(--ink)}
+  .hintctx{color:var(--muted);font-size:14px}
+
+  .inputs{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin:12px 0 6px}
+  .field{display:flex;flex-direction:row;align-items:center;gap:9px}
+  .field label{font-size:16px;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .inputhint{font-size:12.5px;color:var(--muted);margin-top:2px}
+  input[type=text]{
+    background:var(--bg2);border:1px solid var(--line);color:var(--ink);
+    padding:9px 12px;border-radius:10px;font-size:15px;width:120px;outline:none;font-variant-numeric:tabular-nums}
+  input[type=text]:focus{border-color:var(--accent)}
+
+  .opts{display:flex;flex-direction:column;gap:8px;margin:8px 0}
+  .opt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);
+    border-radius:10px;cursor:pointer;background:var(--bg2);transition:.12s}
+  .opt:hover{border-color:var(--accent)}
+  .opt.sel{border-color:var(--accent);background:#212a47}
+  .opt .mark{width:20px;height:20px;border:2px solid var(--line);border-radius:6px;flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;margin-top:1px}
+  .opt.radio .mark{border-radius:50%}
+  .opt.sel .mark{background:var(--accent);border-color:var(--accent)}
+  .opt .txt{font-size:14.5px}
+
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  button.btn{border:none;cursor:pointer;font-weight:600;font-size:14px;padding:10px 16px;border-radius:10px;transition:.12s}
+  .btn.primary{background:linear-gradient(135deg,var(--accent),#5a6cff);color:#fff}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+  .btn.ghost:hover{color:var(--ink);border-color:var(--accent)}
+
+  .feedback{margin-top:12px;font-size:14.5px;padding:10px 14px;border-radius:10px;display:none}
+  .feedback.show{display:block}
+  .feedback.ok{background:rgba(54,211,153,.12);border:1px solid rgba(54,211,153,.4);color:#9bf0cd}
+  .feedback.no{background:rgba(255,107,129,.1);border:1px solid rgba(255,107,129,.4);color:#ffb3bf}
+
+  .solution{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px;display:none;color:var(--muted);font-size:14.5px}
+  .solution.show{display:block;animation:fade .2s}
+  .solution h4{margin:0 0 6px;color:var(--ink);font-size:14px}
+  .solution .calc{font-family:ui-monospace,Menlo,monospace;background:var(--bg2);padding:8px 12px;border-radius:8px;margin:6px 0;color:var(--ink);overflow-x:auto}
+
+  /* Fraction */
+  .frac{display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;margin:0 2px;line-height:1.1}
+  .frac .num{border-bottom:1.5px solid currentColor;padding:0 4px}
+  .frac .den{padding:0 4px}
+
+  /* tree svg */
+  .diagram{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px;margin:10px 0;overflow-x:auto}
+  .diagram svg{display:block;margin:auto}
+  text{fill:var(--ink);font-family:inherit}
+  .edge{stroke:var(--line);stroke-width:2;fill:none}
+  .edge.hot{stroke:var(--accent2)}
+  .node{fill:var(--card2);stroke:var(--line);stroke-width:2}
+  .plab{fill:var(--accent2);font-size:13px;font-weight:600}
+
+  /* lab */
+  .lab{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin:16px 0;box-shadow:var(--shadow)}
+  .lab h3{margin:0 0 4px;font-size:18px}
+  .lab p.sub{margin:0 0 14px;color:var(--muted);font-size:14px}
+  .ctrls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0 14px}
+  .chip{background:var(--bg2);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:13px;color:var(--muted)}
+  .chip b{color:var(--ink)}
+  .barchart{display:flex;align-items:flex-end;gap:10px;height:200px;padding:8px 4px;border-bottom:2px solid var(--line);position:relative}
+  .barcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;height:100%}
+  .bar{width:100%;max-width:60px;background:linear-gradient(180deg,var(--accent),#4a5cff);border-radius:8px 8px 0 0;transition:height .25s;min-height:2px}
+  .barcol .face{font-size:20px;margin-top:6px}
+  .barcol .pct{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .theoLine{position:absolute;left:0;right:0;border-top:2px dashed var(--warn)}
+  .theoTag{position:absolute;right:0;font-size:11px;color:var(--warn);transform:translateY(-100%)}
+
+  .dice3d{font-size:46px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4))}
+
+  .sliderRow{display:flex;align-items:center;gap:12px;margin:8px 0;font-size:14px;color:var(--muted)}
+  .sliderRow input[type=range]{flex:1;accent-color:var(--accent)}
+  .sliderRow b{color:var(--ink);min-width:54px;text-align:right;font-variant-numeric:tabular-nums}
+
+  .pathTable{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+  .pathTable th,.pathTable td{border:1px solid var(--line);padding:7px 10px;text-align:center}
+  .pathTable th{color:var(--muted);font-weight:600;background:var(--bg2)}
+  .sumcheck{margin-top:8px;font-size:13px}
+
+  footer{margin-top:40px;color:var(--muted);font-size:13px;text-align:center}
+  .kbd{font-family:ui-monospace,monospace;background:var(--bg2);border:1px solid var(--line);padding:1px 6px;border-radius:6px;font-size:12px}
+  .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;background:var(--bg2);border:1px solid var(--line);color:var(--muted);margin-left:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="badge">Mathematik LK · Q1 → Q2</span>
+    <h1>Stochastik-Wiederholung 🎲</h1>
+    <p>Pfadregel · Summenregel · Ergebnis vs. Ereignis. Jedes Thema mit 5 Aufgaben in steigender Schwierigkeit, sofortiger Überprüfung und ausführlichem Lösungsweg – plus ein interaktives Labor zum Experimentieren.</p>
+    <div class="legend">
+      <span><b>Schwierigkeit:</b> ★☆☆☆☆ leicht → ★★★★★ Abi-Niveau</span>
+      <span><b>Eingabe:</b> Brüche wie <span class="kbd">3/8</span> oder Dezimal <span class="kbd">0,375</span></span>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs"></nav>
+
+  <!-- ============ PFADREGEL ============ -->
+  <section class="panel" data-tab="pfad">
+    <div class="intro">
+      <h3>🌿 Pfadregel (Produktregel)</h3>
+      Die Wahrscheinlichkeit eines <b>Ergebnisses</b> (ein vollständiger Pfad im Baumdiagramm) ist das <b>Produkt</b> der Wahrscheinlichkeiten entlang des Pfades.<br>
+      Beispiel: <span class="q">P(0,&nbsp;1,&nbsp;1) = </span><span class="frac"><span class="num">1</span><span class="den">5</span></span>·<span class="frac"><span class="num">4</span><span class="den">5</span></span>·<span class="frac"><span class="num">4</span><span class="den">5</span></span> = <span class="frac"><span class="num">16</span><span class="den">125</span></span>.
+      <div class="progwrap"><span id="prog-pfad-txt">0 / 5</span><span class="progbar"><i id="prog-pfad"></i></span></div>
+    </div>
+    <div id="ex-pfad"></div>
+  </section>
+
+  <!-- ============ SUMMENREGEL ============ -->
+  <section class="panel" data-tab="summe">
+    <div class="intro">
+      <h3>➕ Summenregel</h3>
+      Ein <b>Ereignis</b> besteht aus mehreren Ergebnissen. Seine Wahrscheinlichkeit ist die <b>Summe</b> der Wahrscheinlichkeiten aller dazugehörigen Pfade (Ergebnisse).<br>
+      Tipp: Bei „mindestens“ / „höchstens“ lohnt oft das <b>Gegenereignis</b>: P(E) = 1 − P(Ē).
+      <div class="progwrap"><span id="prog-summe-txt">0 / 5</span><span class="progbar"><i id="prog-summe"></i></span></div>
+    </div>
+    <div id="ex-summe"></div>
+  </section>
+
+  <!-- ============ ERGEBNIS / EREIGNIS ============ -->
+  <section class="panel" data-tab="begriff">
+    <div class="intro">
+      <h3>🎯 Ergebnis vs. Ereignis – sauber aufschreiben</h3>
+      <b>Ergebnis</b> = ein einzelner Ausgang des Zufallsexperiments (ein Element von S).<br>
+      <b>Ergebnismenge S</b> = Menge <i>aller</i> möglichen Ergebnisse.<br>
+      <b>Ereignis E</b> = eine <i>Teilmenge</i> von S (kann ein, mehrere oder kein Ergebnis enthalten). Schreibweise immer als <b>Menge</b>: E = { … }.
+      <div class="progwrap"><span id="prog-begriff-txt">0 / 5</span><span class="progbar"><i id="prog-begriff"></i></span></div>
+    </div>
+    <div id="ex-begriff"></div>
+  </section>
+
+  <!-- ============ LABOR ============ -->
+  <section class="panel" data-tab="labor">
+    <div class="intro">
+      <h3>🔬 Stochastik-Labor</h3>
+      Experimentiere mit echtem Zufall. Beobachte, wie sich relative Häufigkeiten den theoretischen Wahrscheinlichkeiten annähern (Gesetz der großen Zahlen) und spiel mit einem interaktiven Baumdiagramm.
+    </div>
+
+    <!-- Würfel -->
+    <div class="lab">
+      <h3>🎲 Würfel-Simulator <span class="pill">relative Häufigkeit ≈ 1/6</span></h3>
+      <p class="sub">Wirf den Würfel oft und vergleiche die Verteilung mit dem theoretischen Wert <span class="frac"><span class="num">1</span><span class="den">6</span></span> ≈ 16,67 %.</p>
+      <div class="ctrls">
+        <span class="dice3d" id="dieFace">🎲</span>
+        <button class="btn primary" onclick="rollDice(1)">1× würfeln</button>
+        <button class="btn ghost" onclick="rollDice(10)">10×</button>
+        <button class="btn ghost" onclick="rollDice(100)">100×</button>
+        <button class="btn ghost" onclick="rollDice(1000)">1000×</button>
+        <button class="btn ghost" onclick="resetDice()">Reset</button>
+        <span class="chip">Würfe gesamt: <b id="dieTotal">0</b></span>
+      </div>
+      <div class="barchart" id="diceChart"></div>
+    </div>
+
+    <!-- LLN -->
+    <div class="lab">
+      <h3>📈 Gesetz der großen Zahlen <span class="pill">Münzwurf</span></h3>
+      <p class="sub">Relative Häufigkeit für „Kopf“ pendelt sich bei mehr Würfen um <b>0,5</b> ein.</p>
+      <div class="ctrls">
+        <button class="btn primary" onclick="flip(1)">+1 Wurf</button>
+        <button class="btn ghost" onclick="flip(20)">+20</button>
+        <button class="btn ghost" onclick="flip(200)">+200</button>
+        <button class="btn ghost" onclick="resetFlip()">Reset</button>
+        <span class="chip">Würfe: <b id="flipN">0</b></span>
+        <span class="chip">Kopf: <b id="flipH">0</b></span>
+        <span class="chip">rel. Häufigkeit: <b id="flipFreq">–</b></span>
+      </div>
+      <div class="diagram"><svg id="llnSvg" viewBox="0 0 640 240" width="100%"></svg></div>
+    </div>
+
+    <!-- Interactive tree -->
+    <div class="lab">
+      <h3>🌳 Interaktives Baumdiagramm <span class="pill">Pfad- &amp; Summenregel live</span></h3>
+      <p class="sub">Zweistufiges Experiment. Stelle die Wahrscheinlichkeiten ein und sieh, wie sich die Pfadprodukte und P(B) verändern.</p>
+      <div class="sliderRow">P(A) erste Stufe <input type="range" id="sA" min="0" max="100" value="40" oninput="drawTree()"><b id="sAv">0,40</b></div>
+      <div class="sliderRow">P(B | A) <input type="range" id="sBA" min="0" max="100" value="70" oninput="drawTree()"><b id="sBAv">0,70</b></div>
+      <div class="sliderRow">P(B | Ā) <input type="range" id="sBnA" min="0" max="100" value="20" oninput="drawTree()"><b id="sBnAv">0,20</b></div>
+      <div class="diagram"><svg id="treeSvg" viewBox="0 0 640 300" width="100%"></svg></div>
+      <table class="pathTable" id="pathTable"></table>
+      <div class="sumcheck" id="sumCheck"></div>
+    </div>
+  </section>
+
+  <footer>
+    Selbstständige Lerndatei · funktioniert offline · viel Erfolg beim Wiederholen! 💪
+  </footer>
+</div>
+
+<script>
+/* ---------- Helpers ---------- */
+function F(a,b){return `<span class="frac"><span class="num">${a}</span><span class="den">${b}</span></span>`;}
+function parseNum(s){
+  if(s==null) return NaN;
+  s=(''+s).trim().replace(',', '.').replace(/\s+/g,'');
+  if(s==='') return NaN;
+  if(s.includes('/')){
+    const p=s.split('/'); if(p.length!==2) return NaN;
+    const a=parseFloat(p[0]), b=parseFloat(p[1]);
+    if(!b) return NaN; return a/b;
+  }
+  if(s.endsWith('%')) return parseFloat(s)/100;
+  return parseFloat(s);
+}
+const close=(a,b)=>Math.abs(a-b)<0.0015;
+
+/* ---------- Exercise data ---------- */
+const DATA = {
+ pfad:[
+  {d:1,ctx:"Eine faire Münze wird zweimal nacheinander geworfen. Wir notieren Kopf mit K und Zahl mit Z, das Ergebnis als Paar (z. B. (K, K)).",
+   q:`Berechne mit der Pfadregel die Wahrscheinlichkeit dafür, dass <b>beide</b> Würfe „Kopf“ zeigen.`,
+   type:"frac", ans:[{label:"P(K, K) =",v:0.25,sol:"1/4"}],
+   sol:`Beide Würfe sind unabhängig und zeigen je mit ${F(1,2)} Kopf.<br>
+        Pfadregel (Faktoren entlang des Pfades multiplizieren): P(K, K)=${F(1,2)}·${F(1,2)}=${F(1,4)}=0,25.`},
+
+  {d:2,ctx:"Es werden gleichzeitig ein fairer Würfel und eine faire Münze geworfen. Beide Geräte beeinflussen sich nicht (unabhängig).",
+   q:`Berechne die Wahrscheinlichkeit dafür, dass der Würfel eine „6“ und die Münze „Wappen“ zeigt.`,
+   type:"frac", ans:[{label:"P(6, Wappen) =",v:1/12,sol:"1/12"}],
+   sol:`Einzelwahrscheinlichkeiten: P(6)=${F(1,6)}, P(Wappen)=${F(1,2)}.<br>
+        Pfadprodukt: ${F(1,6)}·${F(1,2)}=${F(1,12)} ≈ 0,0833.`},
+
+  {d:3,ctx:"In einer Urne liegen 5 rote und 3 blaue Kugeln (insgesamt 8). Es werden nacheinander zwei Kugeln <b>ohne Zurücklegen</b> gezogen.",
+   q:`Berechne die Wahrscheinlichkeit dafür, dass <b>beide</b> gezogenen Kugeln rot sind, also P(rot, rot).`,
+   type:"frac", ans:[{label:"P(rot, rot) =",v:5/14,sol:"5/14"}],
+   sol:`Erste Kugel rot: ${F(5,8)} (5 rote von 8).<br>
+        Danach liegen noch 4 rote von 7 Kugeln in der Urne, also zweite Kugel rot: ${F(4,7)}.<br>
+        Pfadregel: P(rot, rot)=${F(5,8)}·${F(4,7)}=${F(20,56)}=${F(5,14)} ≈ 0,357.<br>
+        <b>Achtung:</b> Beim Ziehen ohne Zurücklegen ändert sich der Nenner von 8 auf 7!`},
+
+  {d:4,ctx:"Heilpraktiker-Beispiel: Bei 3 unabhängigen Patienten stimmt die Diagnose jeweils mit Wahrscheinlichkeit 4/5 (im Baum mit 1 notiert) und ist mit Wahrscheinlichkeit 1/5 falsch (mit 0 notiert). Ein Ergebnis ist ein Tripel wie (0, 1, 1).",
+   q:`Berechne die Wahrscheinlichkeit des Ergebnisses (0, 1, 1) – die erste Diagnose ist falsch, die zweite und dritte stimmen.`,
+   type:"frac", ans:[{label:"P(0, 1, 1) =",v:16/125,sol:"16/125"}],
+   sol:`Es gilt P(0)=${F(1,5)} und P(1)=${F(4,5)}.<br>
+        Pfadregel entlang des Pfades 0 → 1 → 1:<br>
+        P(0, 1, 1)=${F(1,5)}·${F(4,5)}·${F(4,5)}=${F(16,125)}=0,128.`},
+
+  {d:5,ctx:"Eine Ampel zeigt bei jeder Vorbeifahrt unabhängig mit Wahrscheinlichkeit P(G)=0,4 Grün (G) und mit P(R)=0,6 Rot (R). Eine Person passiert die Ampel an drei aufeinanderfolgenden Tagen.",
+   q:`Berechne die Wahrscheinlichkeit des Ergebnisses (G, R, G): am ersten Tag Grün, am zweiten Rot, am dritten wieder Grün.`,
+   type:"frac", ans:[{label:"P(G, R, G) =",v:12/125,sol:"12/125 = 0,096"}],
+   sol:`Als Brüche: 0,4=${F(2,5)} und 0,6=${F(3,5)}.<br>
+        Pfadregel: P(G, R, G)=0,4·0,6·0,4 = ${F(2,5)}·${F(3,5)}·${F(2,5)} = ${F(12,125)} = 0,096.<br>
+        Die Reihenfolge legt fest, welche Faktoren multipliziert werden – jeder Pfad ist ein eigenes Ergebnis.`},
+ ],
+
+ summe:[
+  {d:1,ctx:"Zwei faire Münzen werden geworfen. Die Ergebnismenge ist S = {KK, KZ, ZK, ZZ}, jedes Ergebnis hat die Wahrscheinlichkeit 1/4.",
+   q:`Bestimme die Wahrscheinlichkeit des Ereignisses E: „<b>genau einmal</b> Kopf“ – addiere dazu die Wahrscheinlichkeiten aller passenden Ergebnisse.`,
+   type:"frac", ans:[{label:"P(E) =",v:0.5,sol:"1/2"}],
+   sol:`Zu E gehören die Ergebnisse mit genau einem K: E={KZ, ZK}. Jedes hat ${F(1,4)}.<br>
+        Summenregel: P(E)=${F(1,4)}+${F(1,4)}=${F(2,4)}=${F(1,2)}=0,5.`},
+
+  {d:2,ctx:"Ein fairer Würfel wird einmal geworfen. Jede Augenzahl von 1 bis 6 tritt mit Wahrscheinlichkeit 1/6 auf.",
+   q:`Bestimme die Wahrscheinlichkeit des Ereignisses E: „Augenzahl ist <b>durch 3 teilbar</b>“.`,
+   type:"frac", ans:[{label:"P(E) =",v:1/3,sol:"1/3"}],
+   sol:`Durch 3 teilbar sind die Augenzahlen 3 und 6, also E={3, 6}, jede mit ${F(1,6)}.<br>
+        Summenregel: P(E)=${F(1,6)}+${F(1,6)}=${F(2,6)}=${F(1,3)} ≈ 0,333.`},
+
+  {d:3,ctx:"Heilpraktiker-Beispiel: 3 unabhängige Patienten, Diagnose stimmt mit 4/5 (notiert als 1), falsch mit 1/5 (notiert als 0).",
+   q:`Bestimme die Wahrscheinlichkeit des Ereignisses E: „<b>genau zwei</b> der drei Diagnosen stimmen“.`,
+   type:"frac", ans:[{label:"P(E) =",v:48/125,sol:"48/125"}],
+   sol:`Genau zwei „1“ liefern die Ergebnisse (1,1,0), (1,0,1) und (0,1,1).<br>
+        Jedes hat nach der Pfadregel ${F(4,5)}·${F(4,5)}·${F(1,5)}=${F(16,125)}.<br>
+        Summenregel über die drei Pfade: P(E)=3·${F(16,125)}=${F(48,125)}=0,384.`},
+
+  {d:4,ctx:"Heilpraktiker-Beispiel (gleiche Annahmen wie zuvor: 4/5 richtig, 1/5 falsch, 3 Patienten).",
+   q:`Bestimme die Wahrscheinlichkeit des Ereignisses F: „<b>mindestens zwei</b> Diagnosen stimmen“.`,
+   type:"frac", ans:[{label:"P(F) =",v:112/125,sol:"112/125"}],
+   sol:`„Mindestens zwei“ bedeutet „genau zwei“ <i>oder</i> „alle drei“.<br>
+        Genau zwei: ${F(48,125)} (aus Aufgabe 3). Alle drei (1,1,1): ${F(4,5)}·${F(4,5)}·${F(4,5)}=${F(64,125)}.<br>
+        Summenregel: P(F)=${F(48,125)}+${F(64,125)}=${F(112,125)}=0,896.`},
+
+  {d:5,ctx:"Heilpraktiker-Beispiel (gleiche Annahmen). Tipp: Das Gegenereignis spart hier viel Rechnung.",
+   q:`Bestimme die Wahrscheinlichkeit des Ereignisses G: „<b>höchstens eine</b> Diagnose stimmt“. Nutze, dass G das Gegenereignis zu F aus Aufgabe 4 ist.`,
+   type:"frac", ans:[{label:"P(G) =",v:13/125,sol:"13/125"}],
+   sol:`Das Gegenereignis von „höchstens eine“ ist „mindestens zwei“ (= F).<br>
+        Also: P(G)=1−P(F)=1−${F(112,125)}=${F(13,125)}=0,104.<br>
+        Direkt nachgerechnet: (0,0,0)=${F(1,125)} plus „genau eine 1“: 3·${F(4,125)}=${F(12,125)} ⇒ Summe ${F(13,125)}. ✓`},
+ ],
+
+ begriff:[
+  {d:1,ctx:"Ein fairer Würfel wird einmal geworfen. Die Ergebnismenge S ist die Menge <b>aller</b> möglichen einzelnen Ausgänge des Zufallsexperiments.",
+   q:`Welche der folgenden Mengen ist die <b>Ergebnismenge S</b> dieses Experiments?`,
+   type:"mc",
+   options:[
+    {t:`S = {1, 2, 3, 4, 5, 6}`,correct:true},
+    {t:`S = {gerade, ungerade}`},
+    {t:`S = {6}`},
+    {t:`S = {„Augenzahl &gt; 3“}`},
+   ],
+   sol:`S enthält <b>alle</b> möglichen einzelnen Ausgänge: S={1,2,3,4,5,6}. „gerade/ungerade“ oder „Augenzahl&gt;3“ beschreiben dagegen <b>Ereignisse</b> (Teilmengen von S), aber nicht die vollständige Ergebnismenge.`},
+
+  {d:2,ctx:"Eine faire Münze wird zweimal geworfen (K = Kopf, Z = Zahl). Die Ergebnismenge ist S = {KK, KZ, ZK, ZZ}. Ein Ereignis ist eine Teilmenge dieser Ergebnisse.",
+   q:`Markiere alle Ergebnisse, die zum Ereignis E: „<b>mindestens einmal Kopf</b>“ gehören.`,
+   type:"multi",
+   options:[{t:`KK`,correct:true},{t:`KZ`,correct:true},{t:`ZK`,correct:true},{t:`ZZ`}],
+   sol:`„Mindestens einmal Kopf“ umfasst alle Ergebnisse mit wenigstens einem K: E={KK, KZ, ZK}. Nur ZZ (kein Kopf) gehört nicht dazu.`},
+
+  {d:3,ctx:"In einem Strumpf liegen 6 rote (r) und 4 grüne (g) Kugeln. Es wird zweimal <b>mit</b> Zurücklegen gezogen und die Farbe notiert. Die Ergebnismenge ist S = {rr, rg, gr, gg}.",
+   q:`Gib das Ereignis E: „<b>mindestens eine grüne</b> Kugel“ als Menge an – markiere alle dazugehörigen Ergebnisse.`,
+   type:"multi",
+   options:[{t:`rr`},{t:`rg`,correct:true},{t:`gr`,correct:true},{t:`gg`,correct:true}],
+   sol:`E = {rg, gr, gg}. Das Gegenereignis wäre Ē = {rr} („keine grüne“). Beachte: rg und gr sind verschiedene Ergebnisse, weil die Reihenfolge der Züge mitgezählt wird.`},
+
+  {d:4,ctx:"Heilpraktiker-Beispiel: 3 Patienten, eine Diagnose ist richtig (1) oder falsch (0); ein Ergebnis ist ein Tripel wie (1,0,1). Gegeben ist das Ereignis E = {(0,0,0), (1,0,0), (0,1,0), (0,0,1)}.",
+   q:`Welche Beschreibung in Worten passt genau zu diesem Ereignis E?`,
+   type:"mc",
+   options:[
+    {t:`„Höchstens eine Diagnose stimmt.“`,correct:true},
+    {t:`„Genau zwei Diagnosen stimmen.“`},
+    {t:`„Mindestens eine Diagnose stimmt.“`},
+    {t:`„Keine Diagnose stimmt.“`},
+   ],
+   sol:`E enthält die Tripel mit <b>null oder genau einer</b> „1“ – also „höchstens eine Diagnose stimmt“. (0,0,0) = keine stimmt, die übrigen drei Tripel = je genau eine stimmt.`},
+
+  {d:5,ctx:"Hier geht es um grundlegende Begriffe der Stochastik: Ergebnismenge S, Ereignis als Teilmenge von S, das sichere Ereignis (S selbst, P=1), das unmögliche Ereignis (die leere Menge, P=0) sowie die Frage, was eine konkrete Versuchsreihe über die Fairness eines Geräts aussagt. Beurteile dazu die folgenden fünf Aussagen.",
+   q:`Markiere alle Aussagen, die <b>wahr</b> sind.`,
+   type:"multi",
+   options:[
+    {t:`Es gibt kein Zufallsgerät, mit dem man 7 gleich wahrscheinliche Ergebnisse erhält.`},
+    {t:`Bei zwei Münzen ist P(„einmal Wappen, einmal Zahl“) = P(„einmal Zahl, einmal Wappen“).`,correct:true},
+    {t:`Die Ergebnismenge S ist auch ein Ereignis, und es gilt P(S) = 1.`,correct:true},
+    {t:`Die leere Menge ist bei jedem Zufallsexperiment ein Ereignis mit Wahrscheinlichkeit 0.`,correct:true},
+    {t:`Wenn man fünfmal nacheinander eine 6 würfelt, ist der Würfel sicher gezinkt.`},
+   ],
+   sol:`<b>Wahr:</b> b, c, d.<br>
+        a) <b>falsch</b> – z. B. ein Glücksrad mit 7 gleichen Sektoren liefert 7 gleich wahrscheinliche Ergebnisse.<br>
+        b) <b>wahr</b> – beide Formulierungen beschreiben dasselbe Ereignis {WZ, ZW}.<br>
+        c) <b>wahr</b> – S ist das sichere Ereignis, P(S)=1.<br>
+        d) <b>wahr</b> – ∅ ist das unmögliche Ereignis, P(∅)=0.<br>
+        e) <b>falsch</b> – auch mit fairem Würfel möglich: (1/6)⁵ ≈ 0,013 % – selten, aber nicht unmöglich.`},
+ ],
+};
+
+/* ---------- Render exercises ---------- */
+const solved = {pfad:new Set(),summe:new Set(),begriff:new Set()};
+
+function stars(d){let s='';for(let i=1;i<=5;i++)s+=i<=d?'★':'<span class="off">★</span>';return s;}
+
+function buildExercises(topic){
+  const host=document.getElementById('ex-'+topic);
+  DATA[topic].forEach((ex,i)=>{
+    const card=document.createElement('div');card.className='ex';
+    let inner=`<div class="top"><span class="no">Aufgabe ${i+1}</span><span class="stars">${stars(ex.d)}</span></div>`;
+    inner+=`<div class="prompt"><div class="hintctx">${ex.ctx}</div><div class="q">${ex.q}</div></div>`;
+
+    if(ex.type==='frac'){
+      inner+=`<div class="inputs">`;
+      ex.ans.forEach((a,j)=>{
+        inner+=`<div class="field"><label>${a.label}</label><input type="text" data-i="${j}" placeholder="" aria-label="${a.label.replace(/<[^>]*>/g,'')}"></div>`;
+      });
+      inner+=`</div><div class="inputhint">Eingabe als Bruch (z. B. 3/8) oder als Dezimalzahl (z. B. 0,375) – nicht gekürzte Brüche werden auch akzeptiert.</div>`;
+    } else {
+      const cls=ex.type==='mc'?'radio':'';
+      inner+=`<div class="opts">`;
+      ex.options.forEach((o,j)=>{
+        inner+=`<div class="opt ${cls}" data-j="${j}"><span class="mark"></span><span class="txt">${o.t}</span></div>`;
+      });
+      inner+=`</div>`;
+    }
+
+    inner+=`<div class="actions">
+        <button class="btn primary">Prüfen</button>
+        <button class="btn ghost">Lösung anzeigen</button>
+      </div>
+      <div class="feedback"></div>
+      <div class="solution"><h4>Lösungsweg</h4>${ex.sol}</div>`;
+    card.innerHTML=inner;
+    host.appendChild(card);
+
+    // interactions
+    if(ex.type!=='frac'){
+      card.querySelectorAll('.opt').forEach(opt=>{
+        opt.addEventListener('click',()=>{
+          if(ex.type==='mc'){card.querySelectorAll('.opt').forEach(o=>{o.classList.remove('sel');o.querySelector('.mark').textContent='';});opt.classList.add('sel');opt.querySelector('.mark').textContent='●';}
+          else{opt.classList.toggle('sel');opt.querySelector('.mark').textContent=opt.classList.contains('sel')?'✓':'';}
+        });
+      });
+    }
+    const [checkBtn,solBtn]=card.querySelectorAll('button');
+    const fb=card.querySelector('.feedback');
+    const solBox=card.querySelector('.solution');
+
+    checkBtn.addEventListener('click',()=>{
+      let ok=false;
+      if(ex.type==='frac'){
+        ok=true;
+        ex.ans.forEach((a,j)=>{
+          const inp=card.querySelector(`input[data-i="${j}"]`);
+          const val=parseNum(inp.value);
+          const good=!isNaN(val)&&close(val,a.v);
+          inp.style.borderColor=good?'var(--good)':'var(--bad)';
+          if(!good)ok=false;
+        });
+      } else if(ex.type==='mc'){
+        const sel=card.querySelector('.opt.sel');
+        ok=sel && ex.options[+sel.dataset.j].correct===true;
+      } else { // multi
+        const chosen=new Set([...card.querySelectorAll('.opt.sel')].map(o=>+o.dataset.j));
+        ok=ex.options.every((o,j)=>(!!o.correct)===chosen.has(j));
+      }
+      fb.className='feedback show '+(ok?'ok':'no');
+      fb.innerHTML= ok ? '✅ <b>Richtig!</b> Sauber gelöst.' : '❌ <b>Noch nicht.</b> Prüfe deine Rechnung oder schau dir den Lösungsweg an.';
+      if(ok){solved[topic].add(i);updateProgress(topic);}
+    });
+
+    solBtn.addEventListener('click',()=>{
+      const show=!solBox.classList.contains('show');
+      solBox.classList.toggle('show',show);
+      solBtn.textContent=show?'Lösung verbergen':'Lösung anzeigen';
+    });
+  });
+}
+
+function updateProgress(topic){
+  const n=solved[topic].size;
+  document.getElementById('prog-'+topic).style.width=(n/5*100)+'%';
+  document.getElementById('prog-'+topic+'-txt').textContent=n+' / 5';
+  const tabCount=document.querySelector(`.tab[data-go="${topic}"] .count`);
+  if(tabCount)tabCount.textContent=n+'/5';
+}
+
+['pfad','summe','begriff'].forEach(buildExercises);
+
+/* ---------- Tabs ---------- */
+const TABS=[
+  {id:'pfad',label:'Pfadregel',icon:'🌿',prog:true},
+  {id:'summe',label:'Summenregel',icon:'➕',prog:true},
+  {id:'begriff',label:'Ergebnis & Ereignis',icon:'🎯',prog:true},
+  {id:'labor',label:'Stochastik-Labor',icon:'🔬',prog:false},
+];
+const tabHost=document.getElementById('tabs');
+TABS.forEach((t,i)=>{
+  const b=document.createElement('button');
+  b.className='tab'+(i===0?' active':'');
+  b.dataset.go=t.id;
+  b.innerHTML=`<span class="dot"></span>${t.icon} ${t.label}${t.prog?` <span class="count">0/5</span>`:''}`;
+  b.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.querySelector(`.panel[data-tab="${t.id}"]`).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+  tabHost.appendChild(b);
+});
+document.querySelector('.panel[data-tab="pfad"]').classList.add('active');
+
+/* ================= LABOR ================= */
+
+/* Dice */
+let diceCounts=[0,0,0,0,0,0];
+const dieEmojis=['⚀','⚁','⚂','⚃','⚄','⚅'];
+function renderDice(){
+  const total=diceCounts.reduce((a,b)=>a+b,0);
+  document.getElementById('dieTotal').textContent=total;
+  const max=Math.max(1,...diceCounts);
+  const chart=document.getElementById('diceChart');
+  chart.innerHTML='';
+  // theoretical dashed line at 1/6 of max-scaled? We scale bars by count/max; theo line as fraction
+  for(let i=0;i<6;i++){
+    const h=total? (diceCounts[i]/max)*100 : 0;
+    const pct=total? (diceCounts[i]/total*100):0;
+    const col=document.createElement('div');col.className='barcol';
+    col.innerHTML=`<span class="pct">${pct.toFixed(1)}%</span>
+       <div class="bar" style="height:${h}%"></div>
+       <span class="face">${dieEmojis[i]}</span>`;
+    chart.appendChild(col);
+  }
+  // theoretical line: position of (1/6 of total) relative to max
+  if(total){
+    const theoFrac=(total/6)/max; // height fraction
+    const line=document.createElement('div');line.className='theoLine';
+    line.style.bottom=`calc(${theoFrac*100}% * (200/200))`;
+    // chart height 200px with bottom border; approximate by absolute bottom
+    line.style.bottom=(theoFrac*184+16)+'px';
+    line.innerHTML=`<span class="theoTag">theoretisch 16,7 %</span>`;
+    chart.appendChild(line);
+  }
+}
+function rollDice(n){
+  let last=1;
+  for(let k=0;k<n;k++){last=Math.floor(Math.random()*6);diceCounts[last]++;}
+  document.getElementById('dieFace').textContent=dieEmojis[last];
+  renderDice();
+}
+function resetDice(){diceCounts=[0,0,0,0,0,0];document.getElementById('dieFace').textContent='🎲';renderDice();}
+renderDice();
+
+/* LLN coin */
+let flips=[]; // 1=head
+function flip(n){
+  for(let k=0;k<n;k++)flips.push(Math.random()<0.5?1:0);
+  renderLLN();
+}
+function resetFlip(){flips=[];renderLLN();}
+function renderLLN(){
+  const N=flips.length;
+  const heads=flips.reduce((a,b)=>a+b,0);
+  document.getElementById('flipN').textContent=N;
+  document.getElementById('flipH').textContent=heads;
+  document.getElementById('flipFreq').textContent=N? (heads/N).toFixed(3).replace('.',','):'–';
+  const svg=document.getElementById('llnSvg');
+  const W=640,H=240,padL=44,padB=26,padT=14,padR=14;
+  const x0=padL,x1=W-padR,y0=H-padB,y1=padT;
+  const yOf=p=>y0-(y1===y0?0:(p)*(y0-y1)); // p in [0,1]
+  let g=`<line x1="${x0}" y1="${yOf(0.5)}" x2="${x1}" y2="${yOf(0.5)}" stroke="var(--warn)" stroke-width="2" stroke-dasharray="6 5"/>
+         <text x="${x1-2}" y="${yOf(0.5)-6}" fill="var(--warn)" font-size="12" text-anchor="end">P = 0,5</text>`;
+  // axes
+  g+=`<line x1="${x0}" y1="${y1}" x2="${x0}" y2="${y0}" class="edge"/>
+      <line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y0}" class="edge"/>`;
+  [0,0.5,1].forEach(p=>{g+=`<text x="${x0-8}" y="${yOf(p)+4}" fill="var(--muted)" font-size="11" text-anchor="end">${p.toString().replace('.',',')}</text>`;});
+  g+=`<text x="${x1}" y="${y0+18}" fill="var(--muted)" font-size="11" text-anchor="end">Würfe →</text>`;
+  if(N>0){
+    let cum=0,pts=[];
+    const step=(x1-x0)/Math.max(1,N);
+    for(let i=0;i<N;i++){cum+=flips[i];const f=cum/(i+1);pts.push(`${(x0+step*(i+1)).toFixed(1)},${yOf(f).toFixed(1)}`);}
+    g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--accent2)" stroke-width="2.5"/>`;
+    const lastF=cum/N;
+    g+=`<circle cx="${(x0+step*N).toFixed(1)}" cy="${yOf(lastF).toFixed(1)}" r="4" fill="var(--accent)"/>`;
+  } else {
+    g+=`<text x="${(x0+x1)/2}" y="${(y0+y1)/2}" fill="var(--muted)" font-size="13" text-anchor="middle">Wirf die Münze, um die Kurve zu sehen</text>`;
+  }
+  svg.innerHTML=g;
+}
+renderLLN();
+
+/* Interactive tree */
+function drawTree(){
+  const pA=+document.getElementById('sA').value/100;
+  const pBA=+document.getElementById('sBA').value/100;
+  const pBnA=+document.getElementById('sBnA').value/100;
+  const fmt=x=>x.toFixed(2).replace('.',',');
+  document.getElementById('sAv').textContent=fmt(pA);
+  document.getElementById('sBAv').textContent=fmt(pBA);
+  document.getElementById('sBnAv').textContent=fmt(pBnA);
+
+  const svg=document.getElementById('treeSvg');
+  const root={x:60,y:150};
+  const A={x:300,y:70}, nA={x:300,y:230};
+  const leaves=[{x:560,y:30,l:'A∩B'},{x:560,y:110,l:'A∩B̄'},{x:560,y:190,l:'Ā∩B'},{x:560,y:270,l:'Ā∩B̄'}];
+  const edge=(a,b,lab,hot)=>`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="edge${hot?' hot':''}"/>
+       <text x="${(a.x+b.x)/2}" y="${(a.y+b.y)/2-6}" class="plab" text-anchor="middle">${lab}</text>`;
+  const node=(p,t)=>`<circle cx="${p.x}" cy="${p.y}" r="22" class="node"/><text x="${p.x}" y="${p.y+5}" text-anchor="middle" font-size="14">${t}</text>`;
+  const leaf=(p)=>`<text x="${p.x+10}" y="${p.y+5}" font-size="13" fill="var(--muted)">${p.l}</text>`;
+  let g='';
+  g+=edge(root,A,fmt(pA),true)+edge(root,nA,fmt(1-pA));
+  g+=edge(A,{x:560,y:30},fmt(pBA),true)+edge(A,{x:560,y:110},fmt(1-pBA));
+  g+=edge(nA,{x:560,y:190},fmt(pBnA))+edge(nA,{x:560,y:270},fmt(1-pBnA));
+  g+=node(root,'')+node(A,'A')+node(nA,'Ā');
+  leaves.forEach(leaf=>{}); // placeholder
+  leaves.forEach(p=>g+=leaf(p));
+  svg.innerHTML=g;
+
+  const p1=pA*pBA, p2=pA*(1-pBA), p3=(1-pA)*pBnA, p4=(1-pA)*(1-pBnA);
+  const PB=p1+p3;
+  const row=(n,calc,val)=>`<tr><td>${n}</td><td>${calc}</td><td><b>${val.toFixed(3).replace('.',',')}</b></td></tr>`;
+  document.getElementById('pathTable').innerHTML=
+    `<tr><th>Pfad (Ergebnis)</th><th>Pfadregel</th><th>P</th></tr>`+
+    row('A ∩ B',`${fmt(pA)} · ${fmt(pBA)}`,p1)+
+    row('A ∩ B̄',`${fmt(pA)} · ${fmt(1-pBA)}`,p2)+
+    row('Ā ∩ B',`${fmt(1-pA)} · ${fmt(pBnA)}`,p3)+
+    row('Ā ∩ B̄',`${fmt(1-pA)} · ${fmt(1-pBnA)}`,p4);
+  const sum=p1+p2+p3+p4;
+  document.getElementById('sumCheck').innerHTML=
+    `<b>Summenregel:</b> P(B) = P(A∩B) + P(Ā∩B) = ${p1.toFixed(3).replace('.',',')} + ${p3.toFixed(3).replace('.',',')} = <b style="color:var(--accent2)">${PB.toFixed(3).replace('.',',')}</b>
+     &nbsp;·&nbsp; Kontrolle: alle Pfade summieren zu ${sum.toFixed(3).replace('.',',')} (muss 1 sein ✓)`;
+}
+drawTree();
+</script>
+<!-- rechtliches --><style>.erik-recht{font:13px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center;padding:18px 12px 22px;opacity:.75}.erik-recht a{color:inherit}@media print{.erik-recht{display:none}}</style><footer class="erik-recht"><a href="https://erikdahlmann.github.io/impressum.html">Impressum</a> · <a href="https://erikdahlmann.github.io/datenschutz.html">Datenschutz</a></footer><!-- /rechtliches --></body>
+</html>
